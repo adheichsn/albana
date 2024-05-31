@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->integer('price');
             $table->string('kategori');
+            $table->string('size')->nullable();
             $table->integer('stok');
             $table->longtext('desc')->nullable();
             $table->string('img')->nullable();

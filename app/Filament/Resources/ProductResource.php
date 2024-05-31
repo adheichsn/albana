@@ -40,7 +40,17 @@ class ProductResource extends Resource implements HasShieldPermissions
                     ->required()->options([
                         'baju' => 'Baju',
                         'celana' => 'Celana',
-                        'hijab' => 'Hijab',
+                        'kebaya' => 'Kebaya',
+                        'kemeja' => 'Kemeja',
+                    ])
+                    ->native(false),
+                Forms\Components\Select::make('Size')
+                    ->required()->options([
+                        's' => 'S',
+                        'm' => 'M',
+                        'l' => 'L',
+                        'xl' => 'XL',
+                        'allsize' => 'All Size',
                     ])
                     ->native(false),
                 FileUpload::make('img')
@@ -67,6 +77,8 @@ class ProductResource extends Resource implements HasShieldPermissions
                     })
                     ->sortable(),
                 Tables\Columns\TextColumn::make('kategori')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('size')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('stok')
                     ->numeric()
@@ -104,7 +116,6 @@ class ProductResource extends Resource implements HasShieldPermissions
             //
         ];
     }
-
     public static function getPages(): array
     {
         return [
