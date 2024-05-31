@@ -6,9 +6,11 @@ use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Product;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -41,6 +43,9 @@ class ProductResource extends Resource implements HasShieldPermissions
                         'hijab' => 'Hijab',
                     ])
                     ->native(false),
+                FileUpload::make('img')
+                    ->directory('product-img')
+                    ->required(),
                 Forms\Components\TextInput::make('stok')
                     ->required()
                     ->numeric(),
@@ -66,6 +71,7 @@ class ProductResource extends Resource implements HasShieldPermissions
                 Tables\Columns\TextColumn::make('stok')
                     ->numeric()
                     ->sortable(),
+                Tables\Columns\ImageColumn::make('img')->square(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
