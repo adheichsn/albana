@@ -9,7 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class PostOrder extends Model
 {
     use HasFactory;
-
+    protected $table = 'postorders';
+    protected $guarded = [];
     public function orderes() : BelongsTo
     {
         return $this->belongsTo(Customer::class);

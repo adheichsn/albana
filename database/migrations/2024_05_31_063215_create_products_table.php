@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('kategori');
             $table->integer('stok');
             $table->longtext('desc')->nullable();
+            $table->string('img')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

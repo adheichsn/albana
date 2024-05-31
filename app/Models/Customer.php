@@ -9,5 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Customer extends Model
 {
     use HasFactory;
+    protected $table = 'customers';
+    protected $guarded = [];
 
 }

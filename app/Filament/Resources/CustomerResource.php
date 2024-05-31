@@ -12,8 +12,10 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 
-class CustomerResource extends Resource
+
+class CustomerResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = Customer::class;
 
@@ -37,8 +39,8 @@ class CustomerResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('phone')
                     ->tel()
-                    ->required()
-                    ->numeric(),
+                    ->telRegex('/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/')
+                    ->required(),
                 Forms\Components\TextInput::make('address')
                     ->required()
                     ->maxLength(255),
@@ -57,7 +59,6 @@ class CustomerResource extends Resource
                     ->dateTime()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('phone')
-                    ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('address')
                     ->searchable(),
@@ -102,4 +103,17 @@ class CustomerResource extends Resource
             'edit' => Pages\EditCustomer::route('/{record}/edit'),
         ];
     }
+
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view',
+            'view_any',
+            'create',
+            'update',
+            'delete',
+            'delete_any'
+        ];
+    }
+
 }

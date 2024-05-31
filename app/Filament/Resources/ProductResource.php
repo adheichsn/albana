@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
-use App\Models\User;
+use App\Filament\Resources\ProductResource\Pages;
+use App\Filament\Resources\ProductResource\RelationManagers;
+use App\Models\Product;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -12,14 +12,14 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use function Filament\Support\format_money;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 
 
-class UserResource extends Resource implements HasShieldPermissions
-
+class ProductResource extends Resource implements HasShieldPermissions
 {
-    protected static ?string $model = User::class;
+    protected static ?string $model = Product::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -30,23 +30,22 @@ class UserResource extends Resource implements HasShieldPermissions
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('email')
-                    ->email()
+                Forms\Components\TextInput::make('price')
                     ->required()
-                    ->maxLength(255),
-                Forms\Components\Select::make('roles')
-                    ->relationship('roles', 'name')
-                    ->multiple()
-                    ->preload()
-                    ->searchable(),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
-                Forms\Components\TextInput::make('password')
-                    ->password()
+                    ->numeric()
+                    ->prefix('Rp'),
+                Forms\Components\Select::make('kategori')
+                    ->required()->options([
+                        'baju' => 'Baju',
+                        'celana' => 'Celana',
+                        'hijab' => 'Hijab',
+                    ])
+                    ->native(false),
+                Forms\Components\TextInput::make('stok')
                     ->required()
-                    ->maxLength(255)
-                    ->dehydrateStateUsing(fn ($state) => Hash::make($state))
-                    ->dehydrated(fn ($state) => filled($state))
-                    ->required(fn (string $context): bool => $context === 'create'),
+                    ->numeric(),
+                Forms\Components\Textarea::make('desc')
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -56,15 +55,26 @@ class UserResource extends Resource implements HasShieldPermissions
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email')
+                Tables\Columns\TextColumn::make('price')
+                    ->money('IDR')
+                    ->formatStateUsing(function ($state) {
+                        return Str::replace('IDR', 'Rp', format_money($state, 'IDR'));
+                    })
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('kategori')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('roles.name')
+                Tables\Columns\TextColumn::make('stok')
+                    ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -92,11 +102,12 @@ class UserResource extends Resource implements HasShieldPermissions
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUsers::route('/'),
-            'create' => Pages\CreateUser::route('/create'),
-            'edit' => Pages\EditUser::route('/{record}/edit'),
+            'index' => Pages\ListProducts::route('/'),
+            'create' => Pages\CreateProduct::route('/create'),
+            'edit' => Pages\EditProduct::route('/{record}/edit'),
         ];
     }
+
     public static function getPermissionPrefixes(): array
     {
         return [
@@ -105,7 +116,8 @@ class UserResource extends Resource implements HasShieldPermissions
             'create',
             'update',
             'delete',
-            'delete_any'
+            'delete_any',
+            'publish'
         ];
     }
 }

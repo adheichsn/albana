@@ -11,6 +11,8 @@ class Order extends Model
 {
     use HasFactory;
 
+    protected $table = 'orders';
+    protected $guarded = [];
     public function customer() : HasMany
     {
         return $this->hasMany(Customer::class);
