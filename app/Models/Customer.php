@@ -10,8 +10,4 @@ class Customer extends Model
 {
     use HasFactory;
 
-    public function orders() : BelongsTo
-    {
-        return $this->belongsTo(Customer::class);
-    }
 }
