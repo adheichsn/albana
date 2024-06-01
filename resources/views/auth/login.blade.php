@@ -21,8 +21,6 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-xl-5">
-                <form method="POST" action="{{ route('login') }}">
-                    @csrf
                 <div class="card border-0 rounded-4">
                     <div class="card-body p-3 p-md-4 p-xl-5">
                         <div class="row">
@@ -33,6 +31,8 @@
                                 </div>
                             </div>
                         </div>
+                        <form method="POST" action="{{ route('login') }}">
+                            @csrf
                             <div class="row gy-3 overflow-hidden">
                                 <div class="col-12">
                                     <div class="form-floating mb-3">
