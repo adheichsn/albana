@@ -18,7 +18,7 @@ use App\Http\Controllers\feController;
 Route::controller(feController::class)->group(function() {
     Route::get('/', 'index')->name('index');
     Route::get('/shop', 'shop')->name('shop');
-    Route::get('/detail', 'detail')->name('detail');
+    Route::get('/detail/{id}', 'detail')->name('detail');
     Route::get('/contact', 'contact')->name('contact');
     Route::get('/login', 'showlogin')->name('login');
     Route::post('/login', 'login');

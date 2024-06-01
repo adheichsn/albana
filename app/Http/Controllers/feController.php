@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -39,10 +40,13 @@ class feController extends Controller
         return view('pelanggan.register');
     }
     public function shop() {
-        return view('pelanggan.shop');
+        $perPage = 9;
+        $products = Product::paginate($perPage);
+        return view('pelanggan.shop', compact('products'));
     }
-    public function detail() {
-        return view('pelanggan.detail');
+    public function detail($id) {
+        $product = Product::findOrFail($id);
+        return view('pelanggan.detail', compact('product'));
     }
 
     public function cart() {

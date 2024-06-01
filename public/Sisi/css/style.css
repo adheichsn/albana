@@ -9582,3 +9582,10 @@ a.text-dark:hover, a.text-dark:focus {
     transform: translateY(-15px);
   }
 }
+
+            .product-img-custom {
+                width: 100%;
+                height: 300px; /* Sesuaikan tinggi yang diinginkan */
+                object-fit: contain; /* Mengatur gambar agar tidak terpotong dan menjaga aspek rasio */
+                background-color: #f8f9fa; /* Warna latar belakang untuk area yang kosong */
+            }
