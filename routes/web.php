@@ -27,6 +27,8 @@ Route::controller(feController::class)->group(function() {
         Route::get('/profile', 'profile')->name('profile');
         Route::get('/editprofile', 'editprofile')->name('editprofile');
         Route::get('/cart', 'cart')->name('cart');
+        Route::post('/cart/add', 'addcart')->name('addcart');
+        Route::delete('/cart/remove/{id}', 'removecart')->name('removecart');
         Route::get('/checkout', 'checkout')->name('checkout');
         Route::post('/checkout', 'checkout');
         Route::delete('/delete_cart', 'delete_cart')->name('delete_cart');

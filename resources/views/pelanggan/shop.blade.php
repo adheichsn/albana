@@ -57,7 +57,15 @@
                             </div>
                             <div class="card-footer d-flex justify-content-between bg-light border">
                                 <a href="{{ route('detail', $product->id) }}" class="nav-item nav-link btn btn-sm text-dark p-0"><i class="fas fa-eye text-primary mr-1"></i>View Detail</a> <!-- Tautan untuk melihat detail produk -->
-                                <a href="#" class="btn btn-sm text-dark p-0"><i class="fas fa-shopping-cart text-primary mr-1"></i>Add To Cart</a>
+                                <form action="{{ route('addcart') }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm text-dark p-0">
+                                        <i class="fas fa-shopping-cart text-primary mr-1"></i>Add To Cart
+                                    </button>
+                                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                    <!-- Tambahkan input untuk quantity -->
+                                    <input type="hidden" name="quantity" value="1" min="1">
+                                </form>
                             </div>
                         </div>
                     </div>
