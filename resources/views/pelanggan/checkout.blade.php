@@ -78,38 +78,60 @@
                         <h5 class="font-weight-bold">{{ "Rp." .number_format($total, 2, ",", ".") }}</h5>
                     </div>
                 </div>
-            </div>
-            <div class="card border-secondary mb-5">
-                <div class="card-header bg-secondary border-0">
-                    <h4 class="font-weight-semi-bold m-0">Payment</h4>
-                </div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <div class="custom-control custom-radio">
-                            <input type="radio" class="custom-control-input" name="payment" id="paypal">
-                            <label class="custom-control-label" for="paypal">Paypal</label>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="custom-control custom-radio">
-                            <input type="radio" class="custom-control-input" name="payment" id="directcheck">
-                            <label class="custom-control-label" for="directcheck">Direct Check</label>
-                        </div>
-                    </div>
-                    <div class="">
-                        <div class="custom-control custom-radio">
-                            <input type="radio" class="custom-control-input" name="payment" id="banktransfer">
-                            <label class="custom-control-label" for="banktransfer">Bank Transfer</label>
-                        </div>
-                    </div>
-                </div>
                 <div class="card-footer border-secondary bg-transparent">
-                    <button class="btn btn-lg btn-block btn-primary font-weight-bold my-3 py-3">Place Order</button>
+                    <form id="payment-form" action="{{ route('payment.process') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-lg btn-block btn-primary font-weight-bold my-3 py-3">Checkout</button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
 <!-- Checkout End -->
+
+<!-- Script untuk memicu pembayaran menggunakan Snap Midtrans -->
+@if(isset($snapToken))
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-client-iJt5elw9AGa2XL5h"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function(event) {
+            snap.pay('{{ $snapToken }}', {
+                onSuccess: function(result) {
+                    console.log('Transaction succeeded:', result);
+                    // Redirect to success page or do something else
+                    window.location.href = "{{ route('index') }}";
+                },
+                onPending: function(result) {
+                    console.log('Transaction pending:', result);
+                    // Redirect to pending page or do something else
+                },
+                onError: function(result) {
+                    console.log('Transaction failed:', result);
+                    // Redirect to error page or do something else
+                }
+            });
+        });
+    </script>
+
+        // function updateOrderStatus(orderId, status) {
+        //     $.ajax({
+        //         url: '/update-order-status',
+        //         type: 'POST',
+        //         data: {
+        //             '_token': '{{ csrf_token() }}',
+        //             'orderId': orderId,
+        //             'status': status
+        //         },
+        //         success: function(response) {
+        //             console.log(response);
+        //             // Redirect to success page or do something else
+        //         },
+        //         error: function(xhr, status, error) {
+        //             console.error(xhr.responseText);
+        //             // Redirect to error page or do something else
+        //         }
+        //     });
+        // }
+@endif
 
 @endsection

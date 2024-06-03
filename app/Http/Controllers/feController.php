@@ -3,12 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cart;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\PostOrder;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Midtrans\Config;
+use Midtrans\Snap;
+use Midtrans\Notification;
 
 class feController extends Controller
 {
+    public function __construct()
+    {
+        // Set konfigurasi Midtrans
+        Config::$serverKey = config('services.midtrans.server_key');
+        Config::$isProduction = false; // Set false untuk sandbox mode, true untuk production mode
+        Config::$isSanitized = true;
+        Config::$is3ds = true;
+    }
     public function index()
     {
         return view('pelanggan.index');
@@ -40,6 +54,17 @@ class feController extends Controller
     public function register() {
         return view('pelanggan.register');
     }
+    public function contact() {
+        return view('pelanggan.contact');
+    }
+
+    public function profile() {
+        return view('pelanggan.profile');
+    }
+
+    public function editprofile() {
+        return view('pelanggan.editprofile');
+    }
     public function shop() {
         $perPage = 9;
         $products = Product::paginate($perPage);
@@ -61,7 +86,7 @@ class feController extends Controller
         }
 
         // Set total sama dengan subtotal sementara karena tidak ada biaya pengiriman
-        $total = $subtotal;
+        $total = $subtotal+10000;
 
         return view('pelanggan.cart', compact('cartItems', 'subtotal', 'total'));
     }
@@ -134,15 +159,92 @@ class feController extends Controller
         return view('pelanggan.checkout', compact('customer', 'cartItems', 'subtotal', 'total'));
     }
 
-    public function contact() {
-        return view('pelanggan.contact');
+
+    public function paymentProcess(Request $request)
+    {
+        $customer = Auth::guard('customer')->user();
+        $cartItems = $customer->cartItems()->with('product')->get();
+
+        // Hitung ulang subtotal
+        $subtotal = 0;
+        foreach ($cartItems as $cartItem) {
+            $subtotal += $cartItem->product->price * $cartItem->qty;
+        }
+
+        // Set total sama dengan subtotal sementara karena tidak ada biaya pengiriman
+        $total = $subtotal + 10000;
+
+        // Data transaksi
+        $params = [
+            'transaction_details' => [
+                'order_id' => 'TRX-' . uniqid(), // ID transaksi yang unik, contoh "TRX-..."
+                'gross_amount' => $total, // Total pembayaran
+            ],
+            'customer_details' => [
+                'first_name' => $customer->name,
+                'email' => $customer->email,
+                'phone' => $customer->phone,
+                'address' => $customer->address,
+            ],
+        ];
+
+        try {
+            $snapToken = \Midtrans\Snap::getSnapToken($params);
+
+            // Simpan data order ke database
+            $order = Order::create([
+                'customer_id' => $customer->id,
+                'code_order' => $params['transaction_details']['order_id'],
+                'total_price' => $total,
+                'total' => $total,
+            ]);
+
+            // Simpan setiap item dari keranjang belanja ke dalam tabel order_items
+            foreach ($cartItems as $item) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item->product_id,
+                    'qty' => $item->qty,
+                    'price' => $item->product->price,
+                ]);
+            }
+
+            // Simpan data postorder
+            PostOrder::create([
+                'order_id' => $order->id,
+                'date' => now(), // Tanggal saat ini
+                'status' => 'Unpaid', // Set status menjadi "Unpaid"
+            ]);
+
+            // Hapus semua item di cart
+            $customer->cartItems()->delete();
+
+            // Update status postorder menjadi Paid
+            PostOrder::where('order_id', $order->id)->update(['status' => 'Paid']);
+
+            // Kirim snap token dan customer ke view checkout
+            return view('pelanggan.checkout', compact('snapToken', 'customer', 'cartItems', 'subtotal', 'total'));
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()]);
+        }
     }
 
-    public function profile() {
-        return view('pelanggan.profile');
-    }
+    public function callback(Request $request)
+    {
+        $notification = new Notification();
+        $orderId = $notification->order_id;
+        $status = $notification->transaction_status;
 
-    public function editprofile() {
-        return view('pelanggan.editprofile');
+        // Handle callback Midtrans
+        if ($status == 'capture') {
+            // Update status postorder menjadi sudah dibayar
+            PostOrder::where('order_id', $orderId)->update(['status' => 'Paid']);
+        } elseif ($status == 'cancel' || $status == 'deny' || $status == 'expire') {
+            // Update status postorder menjadi dibatalkan
+            PostOrder::where('order_id', $orderId)->update(['status' => 'Cancelled']);
+        }
+
+        // Redirect user back to the index page
+        return redirect()->route('index')->with('success', 'Pembayaran berhasil!');
     }
 }

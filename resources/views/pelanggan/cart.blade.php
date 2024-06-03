@@ -72,7 +72,7 @@
                     </div>
                     <div class="d-flex justify-content-between">
                         <h6 class="font-weight-medium">Shipping</h6>
-                        <h6 class="font-weight-medium">Rp.10.000</h6>
+                        <h6 class="font-weight-medium">Rp.10.000,00</h6>
                     </div>
                 </div>
                 <div class="card-footer border-secondary bg-transparent">

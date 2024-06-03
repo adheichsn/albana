@@ -31,4 +31,9 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'midtrans' => [
+        'merchant_id' => env('MIDTRANS_MERCHANT_ID', 'G952040733'),
+        'client_key' => env('MIDTRANS_CLIENT_KEY', 'SB-Mid-client-iJt5elw9AGa2XL5h'),
+        'server_key' => env('MIDTRANS_SERVER_KEY', 'SB-Mid-server-dHPeQ1EH3TsTrs5JQiiqOPO1'),
+    ],
 ];

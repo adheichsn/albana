@@ -32,6 +32,9 @@ Route::controller(feController::class)->group(function() {
         Route::get('/checkout', 'checkout')->name('checkout');
         Route::post('/checkout', 'checkout');
         Route::delete('/delete_cart', 'delete_cart')->name('delete_cart');
+        Route::post('/payment/process', 'paymentProcess')->name('payment.process');
+        Route::post('/payment/callback', 'callback')->name('payment.callback');
+        Route::get('/payment/callback', 'callback')->name('payment.callback');
         Route::post('/logout', 'logout')->name('logout');
     });
 });
