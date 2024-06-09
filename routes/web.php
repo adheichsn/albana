@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\RegisterController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\feController;
@@ -22,10 +23,11 @@ Route::controller(feController::class)->group(function() {
     Route::get('/contact', 'contact')->name('contact');
     Route::get('/login', 'showlogin')->name('login');
     Route::post('/login', 'login');
-    Route::get('/register', 'register')->name('register');
+    Route::get('/showRegister', 'showRegister')->name('showRegister');
     Route::middleware(['auth:customer'])->group(function () {
         Route::get('/profile', 'profile')->name('profile');
         Route::get('/editprofile', 'editprofile')->name('editprofile');
+        Route::post('/updateProfile', 'updateProfile')->name('updateProfile');
         Route::get('/cart', 'cart')->name('cart');
         Route::post('/cart/add', 'addcart')->name('addcart');
         Route::delete('/cart/remove/{id}', 'removecart')->name('removecart');
@@ -38,6 +40,8 @@ Route::controller(feController::class)->group(function() {
         Route::post('/logout', 'logout')->name('logout');
     });
 });
+
+Route::post('/register', [RegisterController::class, 'register'])->name('register');
 
 Auth::routes([
     'login'    => false,

@@ -29,7 +29,7 @@
                             <div class="col-12">
                                 <div class="mb-4">
                                     <h3>Sign in</h3>
-                                    <p>Don't have an account? <a href="register">Sign up</a></p>
+                                    <p>Don't have an account? <a href="{{ route('showRegister') }}">Sign up</a></p>
                                 </div>
                             </div>
                         </div>

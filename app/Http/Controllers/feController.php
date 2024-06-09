@@ -37,7 +37,7 @@ class feController extends Controller
 
         if (Auth::guard('customer')->attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended('/');
+            return view('pelanggan.index');
         }
 
         return back()->withErrors([
@@ -51,7 +51,7 @@ class feController extends Controller
 
         return redirect('/');
     }
-    public function register() {
+    public function showRegister() {
         return view('pelanggan.register');
     }
     public function contact() {
@@ -59,12 +59,56 @@ class feController extends Controller
     }
 
     public function profile() {
-        return view('pelanggan.profile');
+        // Ambil data customer yang sedang login
+        $customer = Auth::guard('customer')->user();
+
+        // Kirim data customer ke view
+        return view('pelanggan.profile', compact('customer'));
     }
 
-    public function editprofile() {
-        return view('pelanggan.editprofile');
+    public function editprofile()
+    {
+        $customer = Auth::guard('customer')->user();
+        return view('pelanggan.editprofile', compact('customer'));
     }
+
+    public function updateProfile(Request $request)
+    {
+        $customer = Auth::guard('customer')->user();
+
+        // Validasi data
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:customers,email,' . $customer->id,
+            'phone' => 'required|string|max:15',
+            'address' => 'required|string|max:255',
+        ]);
+
+        // Update data customer
+        $customer->name = $request->input('name');
+        $customer->email = $request->input('email');
+        $customer->phone = $request->input('phone');
+        $customer->address = $request->input('address');
+        
+        // Handle profile picture upload
+        if ($request->hasFile('profile_picture')) {
+            $file = $request->file('profile_picture');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/profile_pictures'), $filename);
+    
+            // Delete old profile picture if exists
+            if ($customer->img && file_exists(public_path('uploads/profile_pictures/' . $customer->img))) {
+                unlink(public_path('uploads/profile_pictures/' . $customer->img));
+            }
+    
+            $customer->img = $filename;
+        }
+    
+        $customer->save();
+    
+        return redirect()->route('profile')->with('success', 'Profile updated successfully');
+    }
+
     public function shop() {
         $perPage = 9;
         $products = Product::paginate($perPage);
