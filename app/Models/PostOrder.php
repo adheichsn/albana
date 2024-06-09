@@ -11,8 +11,8 @@ class PostOrder extends Model
     use HasFactory;
     protected $table = 'postorders';
     protected $guarded = [];
-    public function orderes() : BelongsTo
+    public function order(): BelongsTo
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Order::class, 'order_id', 'id');
     }
 }

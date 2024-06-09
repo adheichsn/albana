@@ -5,11 +5,13 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PostOrderResource\Pages;
 use App\Filament\Resources\PostOrderResource\RelationManagers;
 use App\Models\PostOrder;
+use App\Models\Order;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Actions\Imports\ImportColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
@@ -27,13 +29,26 @@ class PostOrderResource extends Resource implements HasShieldPermissions
             ->schema([
                 Forms\Components\TextInput::make('order_id')
                     ->required()
-                    ->numeric(),
+                    ->numeric()
+                    ->disabled(),
                 Forms\Components\TextInput::make('date')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->disabled(),
                 Forms\Components\TextInput::make('status')
                     ->required()
+                    ->maxLength(255)
+                    ->disabled(),
+                Forms\Components\TextInput::make('resi')
+                    ->required()
                     ->maxLength(255),
+                Forms\Components\Select::make('status_paket')
+                    ->required()
+                    ->options([
+                        'Dalam Proses' => 'Dalam Proses',
+                        'Sudah Dikirim' => 'Sudah Dikirim',
+                    ])
+                    ->native(false),
             ]);
     }
 
@@ -41,12 +56,15 @@ class PostOrderResource extends Resource implements HasShieldPermissions
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('order_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('order.code_order')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('date')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('resi')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('status_paket')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -77,7 +95,9 @@ class PostOrderResource extends Resource implements HasShieldPermissions
     public static function getRelations(): array
     {
         return [
-            //
+            // RelationManagers\Order::class,
+            // RelationManagers\Cart::class,
+            // RelationManagers\Customer::class,
         ];
     }
 

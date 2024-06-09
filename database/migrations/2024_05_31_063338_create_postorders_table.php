@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
             $table->string('date');
             $table->string('status');
+            $table->string('resi')->nullable();
+            $table->string('status_paket')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

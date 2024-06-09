@@ -111,12 +111,20 @@
                                                         document.getElementById('profile-form').submit();">
                                             Profile
                                         </a>
+                                        <a class="dropdown-item" href="{{ route('orderHistory') }}"
+                                        onclick="event.preventDefault();
+                                                        document.getElementById('order-history-form').submit();">
+                                            Order History
+                                        </a>
                                         <a class="dropdown-item" href="{{ route('logout') }}"
                                         onclick="event.preventDefault();
                                                         document.getElementById('logout-form').submit();">
                                             {{ __('Logout') }}
                                         </a>
 
+                                        <form id="order-history-form" action="{{ route('orderHistory') }}" method="GET" class="d-none">
+                                            @csrf
+                                        </form>
                                         <form id="profile-form" action="{{ route('profile') }}" method="GET" class="d-none">
                                             @csrf
                                         </form>

@@ -66,6 +66,15 @@ class feController extends Controller
         return view('pelanggan.profile', compact('customer'));
     }
 
+    public function orderHistory()
+    {
+        $customer = Auth::guard('customer')->user();
+        $history = PostOrder::join('orders', 'postOrders.order_id', '=', 'orders.id')
+            ->where('orders.customer_id', $customer->id)
+            ->select('postOrders.*')
+            ->get();
+        return view('pelanggan.riwayat', compact('history'));
+    }
     public function editprofile()
     {
         $customer = Auth::guard('customer')->user();

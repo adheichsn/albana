@@ -27,6 +27,7 @@ Route::controller(feController::class)->group(function() {
     Route::middleware(['auth:customer'])->group(function () {
         Route::get('/profile', 'profile')->name('profile');
         Route::get('/editprofile', 'editprofile')->name('editprofile');
+        Route::get('/orderHistory', 'orderHistory')->name('orderHistory');
         Route::post('/updateProfile', 'updateProfile')->name('updateProfile');
         Route::get('/cart', 'cart')->name('cart');
         Route::post('/cart/add', 'addcart')->name('addcart');

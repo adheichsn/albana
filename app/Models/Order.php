@@ -19,6 +19,6 @@ class Order extends Model
 
     public function postOrder() : BelongsTo
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(PostOrder::class, 'order_id', 'id');
     }
 }
