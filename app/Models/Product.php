@@ -15,4 +15,9 @@ class Product extends Model
     protected $casts = [
         'attachments' => 'array',
     ];
+    
+    public function orderItem()
+    {
+        return $this->belongsTo(OrderItem::class, 'product_id', 'id');
+    }
 }

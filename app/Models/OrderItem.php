@@ -10,6 +10,7 @@ class OrderItem extends Model
     use HasFactory;
     protected $table = 'order_items';
     protected $guarded = [];
+    
     public function order()
     {
         return $this->belongsTo(Order::class);

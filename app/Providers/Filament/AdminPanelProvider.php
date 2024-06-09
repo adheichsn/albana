@@ -17,6 +17,10 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Filament\Resources\CustomerResource\Widgets\CountCustomer;
+use App\Filament\Resources\PostOrderResource\Widgets\ChartOrder;
+use App\Filament\Resources\PostOrderResource\Widgets\LatestOrders;
+
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -31,13 +35,14 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Amber,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Pages\Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
+                Widgets\AccountWidget::make(),
+                CountCustomer::make(),
+                ChartOrder::make(),
+                LatestOrders::make(),
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -57,4 +62,5 @@ class AdminPanelProvider extends PanelProvider
                 \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make()
             ]);
     }
+
 }
