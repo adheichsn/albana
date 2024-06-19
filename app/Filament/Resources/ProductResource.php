@@ -36,14 +36,14 @@ class ProductResource extends Resource implements HasShieldPermissions
                     ->required()
                     ->numeric()
                     ->prefix('Rp'),
-                Forms\Components\Select::make('kategori')
-                    ->required()->options([
-                        'baju' => 'Baju',
-                        'celana' => 'Celana',
-                        'kebaya' => 'Kebaya',
-                        'kemeja' => 'Kemeja',
-                    ])
-                    ->native(false),
+                    Forms\Components\Select::make('category_id')
+                    ->relationship('category', 'name')
+                    ->required()
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+                    ]),
                 Forms\Components\Select::make('Size')
                     ->required()->options([
                         's' => 'S',
@@ -76,7 +76,8 @@ class ProductResource extends Resource implements HasShieldPermissions
                         return Str::replace('IDR', 'Rp', format_money($state, 'IDR'));
                     })
                     ->sortable(),
-                Tables\Columns\TextColumn::make('kategori')
+                Tables\Columns\TextColumn::make('category.name')
+                    ->label('Category')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('size')
                     ->searchable(),
