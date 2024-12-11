@@ -13,6 +13,7 @@
                         <th>No Resi</th>
                         <th>Total Price</th>
                         <th>Status Paket</th>
+                        <th scope="col">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -34,7 +35,23 @@
                             @else
                                 <span class="badge badge-success">{{ $order->status_paket }}</span>
                             @endif
-                        </td>                        
+                        </td>
+                        <td>
+                             <!-- Action Buttons -->
+                        <form action="{{ route('order.complete', $order->id) }}" method="POST"
+                            style="display:inline-block;">
+                            @csrf
+                            <button type="submit" class="btn btn-success btn-sm">Selesai Orderan</button>
+                        </form>
+
+                        <form action="{{ route('order.reject', $order->id) }}" method="POST"
+                            style="display:inline-block;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-sm">Ajukan Pengembalian</button>
+                        </form>
+                        </td>
+                        
                     </tr>
                     @endforeach
                 </tbody>

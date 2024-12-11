@@ -29,6 +29,8 @@ class OrderResource extends Resource implements HasShieldPermissions
                     ->numeric(),
                 Forms\Components\TextInput::make('code_order')
                     ->maxLength(255),
+                Forms\Components\TextInput::make('shippingcost')
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('total_price')
                     ->required()
                     ->numeric()
@@ -45,7 +47,9 @@ class OrderResource extends Resource implements HasShieldPermissions
                     ->sortable(),
                 Tables\Columns\TextColumn::make('code_order')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('total_price')
+                Tables\Columns\TextColumn::make('shippingcost')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('total')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')

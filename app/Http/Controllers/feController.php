@@ -98,23 +98,23 @@ class feController extends Controller
         $customer->email = $request->input('email');
         $customer->phone = $request->input('phone');
         $customer->address = $request->input('address');
-        
+
         // Handle profile picture upload
         if ($request->hasFile('profile_picture')) {
             $file = $request->file('profile_picture');
             $filename = time() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/profile_pictures'), $filename);
-    
+
             // Delete old profile picture if exists
             if ($customer->img && file_exists(public_path('uploads/profile_pictures/' . $customer->img))) {
                 unlink(public_path('uploads/profile_pictures/' . $customer->img));
             }
-    
+
             $customer->img = $filename;
         }
-    
+
         $customer->save();
-    
+
         return redirect()->route('profile')->with('success', 'Profile updated successfully');
     }
 
@@ -139,7 +139,7 @@ class feController extends Controller
         }
 
         // Set total sama dengan subtotal sementara karena tidak ada biaya pengiriman
-        $total = $subtotal+10000;
+        $total = $subtotal;
 
         return view('pelanggan.cart', compact('cartItems', 'subtotal', 'total'));
     }
@@ -196,24 +196,7 @@ class feController extends Controller
             return redirect()->route('cart')->with('error', 'You are not authorized to remove this item from cart.');
         }
     }
-    public function checkout(Request $request) {
-        $customer = Auth::guard('customer')->user();
-        $cartItems = $customer->cartItems()->with('product')->get();
-
-        // Hitung ulang subtotal
-        $subtotal = 0;
-        foreach ($cartItems as $cartItem) {
-            $subtotal += $cartItem->product->price * $cartItem->qty;
-        }
-
-        // Set total sama dengan subtotal sementara karena tidak ada biaya pengiriman
-        $total = $subtotal+10000;
-
-        return view('pelanggan.checkout', compact('customer', 'cartItems', 'subtotal', 'total'));
-    }
-
-
-    public function paymentProcess(Request $request)
+    public function checkout(Request $request)
     {
         $customer = Auth::guard('customer')->user();
         $cartItems = $customer->cartItems()->with('product')->get();
@@ -223,15 +206,90 @@ class feController extends Controller
         foreach ($cartItems as $cartItem) {
             $subtotal += $cartItem->product->price * $cartItem->qty;
         }
+        // Hitung biaya pengiriman berdasarkan lokasi dan berat
+        $shippingCost = 0;
+        $location = $request->input('location');
 
-        // Set total sama dengan subtotal sementara karena tidak ada biaya pengiriman
-        $total = $subtotal + 10000;
+        if (in_array($location, [
+    'kelapa_dua', 'bojong_nangka', 'pakulonan_barat', 'bencongan', 'bencongan_indah', 'curug_sangereng'
+])) {
+    // Zona 1: Jabodetabek
+    $shippingCost = 15000; // Sesuaikan tarif JNE
+}
 
-        // Data transaksi
+        // Hitung PPN 10%
+        $ppn = $subtotal * 0.1;
+        // Hitung total amount
+        $totalAmount = $subtotal + $shippingCost + $ppn;
+
+        // Kembalikan view dengan data yang diperlukan
+        return view('pelanggan.checkout', compact('customer', 'cartItems', 'subtotal', 'totalAmount', 'shippingCost', 'ppn'));
+    }
+
+
+    public function paymentProcess(Request $request)
+    {
+        $customer = Auth::guard('customer')->user();
+        $cartItems = $customer->cartItems()->with('product')->get();
+
+        // Calculate subtotal
+        $subtotal = 0;
+        foreach ($cartItems as $cartItem) {
+            $subtotal += $cartItem->product->price * $cartItem->qty;
+        }
+
+        // Calculate shipping cost based on location from the request
+        $location = $request->input('location');
+        $shippingCost = 0;
+
+        if (in_array($location, [
+            'kelapa_dua', 'bojong_nangka', 'pakulonan_barat', 'bencongan', 'bencongan_indah', 'curug_sangereng'
+        ])) {
+            $shippingCost = 15000;
+
+        }
+
+        // Hitung PPN 10%
+        $ppn = $subtotal * 0.1;
+
+        // Total amount to be charged (subtotal + shipping cost)
+        $total = $subtotal + $shippingCost + $ppn;
+
+        // Prepare item details array
+        $itemDetails = [];
+
+        foreach ($cartItems as $cartItem) {
+            $itemDetails[] = [
+                'id' => $cartItem->product->id,
+                'price' => $cartItem->product->price,
+                'quantity' => $cartItem->qty,
+                'name' => $cartItem->product->name,
+            ];
+        }
+
+        // Include shipping cost in the item details
+        if ($shippingCost > 0) {
+            $itemDetails[] = [
+                'id' => 'SHIPPING',
+                'price' => $shippingCost,
+                'quantity' => 1,
+                'name' => 'Shipping Cost',
+            ];
+        }
+        if ($ppn > 0) {
+            $itemDetails[] = [
+                'id' => 'ppn',
+                'price' => $ppn,
+                'quantity' => 1,
+                'name' => 'ppn',
+            ];
+        }
+
+        // Transaction parameters for Midtrans
         $params = [
             'transaction_details' => [
-                'order_id' => 'TRX-' . uniqid(), // ID transaksi yang unik, contoh "TRX-..."
-                'gross_amount' => $total, // Total pembayaran
+                'order_id' => 'TRX-' . uniqid(),
+                'gross_amount' => $total,
             ],
             'customer_details' => [
                 'first_name' => $customer->name,
@@ -239,6 +297,7 @@ class feController extends Controller
                 'phone' => $customer->phone,
                 'address' => $customer->address,
             ],
+            'item_details' => $itemDetails,
         ];
 
         try {
@@ -248,7 +307,8 @@ class feController extends Controller
             $order = Order::create([
                 'customer_id' => $customer->id,
                 'code_order' => $params['transaction_details']['order_id'],
-                'total_price' => $total,
+                'total_price' => $subtotal,
+                'shippingcost' => $shippingCost,
                 'total' => $total,
             ]);
 
@@ -262,11 +322,18 @@ class feController extends Controller
                 ]);
             }
 
-            // Simpan data postorder
+            // Update stok produk setelah order
+            foreach ($cartItems as $item) {
+                $product = Product::find($item->product_id);
+                $product->stok -= $item->qty; // Pastikan 'stock' adalah nama kolom yang benar
+                $product->save();
+            }
+
+            // Simpan data statusorder
             PostOrder::create([
                 'order_id' => $order->id,
-                'date' => now(), // Tanggal saat ini
-                'status' => 'Unpaid', // Set status menjadi "Unpaid"
+                'date' => now(),
+                'status' => 'Unpaid',
             ]);
 
             // Hapus semua item di cart
@@ -276,7 +343,7 @@ class feController extends Controller
             PostOrder::where('order_id', $order->id)->update(['status' => 'Paid']);
 
             // Kirim snap token dan customer ke view checkout
-            return view('pelanggan.checkout', compact('snapToken', 'customer', 'cartItems', 'subtotal', 'total'));
+            return view('pelanggan.checkout', compact('snapToken', 'customer', 'shippingCost', 'cartItems', 'subtotal', 'total', 'ppn'));
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()]);
         }

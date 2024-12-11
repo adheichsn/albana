@@ -44,13 +44,14 @@ class ProductResource extends Resource implements HasShieldPermissions
                             ->required()
                             ->maxLength(255),
                     ]),
-                Forms\Components\Select::make('Size')
+                    Forms\Components\Select::make('Size')
                     ->required()->options([
-                        's' => 'S',
-                        'm' => 'M',
-                        'l' => 'L',
-                        'xl' => 'XL',
+                        'S' => 'S',
+                        'M' => 'M',
+                        'L' => 'L',
+                        'XL' => 'XL',
                         'allsize' => 'All Size',
+                        'NONE'=> 'NONE',
                     ])
                     ->native(false),
                 FileUpload::make('img')

@@ -43,6 +43,9 @@ Route::controller(feController::class)->group(function() {
 });
 
 Route::post('/register', [RegisterController::class, 'register'])->name('register');
+Route::post('/orderhistory/complete/{id}', [OrderController::class, 'complete'])->name('order.complete');
+Route::delete('/orderhistory/reject/{id}', [OrderController::class, 'reject'])->name('order.reject');
+
 
 Auth::routes([
     'login'    => false,

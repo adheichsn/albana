@@ -1,98 +1,119 @@
 @extends('komponen.index')
 
 @section('content')
-<div class="container-fluid bg-secondary mb-5">
-    <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
-        <h1 class="font-weight-semi-bold text-uppercase mb-3">Our Shop</h1>
-        <div class="d-inline-flex">
-            <p class="m-0"><a href="">Home</a></p>
-            <p class="m-0 px-2">-</p>
-            <p class="m-0">Shop</p>
-        </div>
-    </div>
-</div>
+    <div class="bg0 m-t-23 p-b-140">
+        <div class="container">
+            <div class="row isotope-grid">
+                @foreach($products as $product)
+                    <div class="col-sm-6 col-md-4 col-lg-3 p-b-35 isotope-item women">
+                        <div class="block2">
+                            <div class="block2-pic hov-img0">
+                                <img src="{{ asset('storage/' . $product->img) }}" alt="{{ $product->name }}">
+                            </div>
 
-<div class="container-fluid pt-5">
-    <div class="row px-xl-5">
-        <div class="col-lg-3 col-md-12">
-        </div>
-        <div class="col-lg-9 col-md-12">
-            <div class="row pb-3">
-                <div class="col-12 pb-1">
-                    <div class="d-flex align-items-center justify-content-between mb-4">
-                        <form action="">
-                            <div class="input-group">
-                                <input type="text" class="form-control" placeholder="Search by name">
-                                <div class="input-group-append">
-                                    <span class="input-group-text bg-transparent text-primary">
-                                        <i class="fa fa-search"></i>
+                            <div class="block2-txt flex-w flex-t p-t-14">
+                                <div class="block2-txt-child1 flex-col-l ">
+                                    <a href="{{ route('detail', $product->id) }}" class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6">
+                                        {{ $product->name }}
+                                    </a>
+                                    <span class="stext-105 cl3">
+                                        {{"Rp." .number_format($product->price, 2, ",", ".") }}
                                     </span>
                                 </div>
-                            </div>
-                        </form>
-                        <div class="dropdown ml-4">
-                            <button class="btn border dropdown-toggle" type="button" id="triggerId"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Sort by
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="triggerId">
-                                <a class="dropdown-item" href="#">Latest</a>
-                                <a class="dropdown-item" href="#">Popularity</a>
-                                <a class="dropdown-item" href="#">Best Rating</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @foreach($products as $product)
-                    <div class="col-lg-4 col-md-6 col-sm-12 pb-1">
-                        <div class="card product-item border-0 mb-4">
-                            <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
-                                <img class="img-fluid w-100 product-img-custom" src="{{ asset('storage/' . $product->img) }}" alt="{{ $product->name }}">
-                            </div>
-                            <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
-                                <h6 class="text-truncate mb-3">{{ $product->name }}</h6>
-                                <div class="d-flex justify-content-center">
-                                    <h6>{{"Rp." .number_format($product->price, 2, ",", ".") }}</h6>
-                                </div>
-                            </div>
-                            <div class="card-footer d-flex justify-content-between bg-light border">
-                                <a href="{{ route('detail', $product->id) }}" class="nav-item nav-link btn btn-sm text-dark p-0"><i class="fas fa-eye text-primary mr-1"></i>View Detail</a> <!-- Tautan untuk melihat detail produk -->
-                                <form action="{{ route('addcart') }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm text-dark p-0">
-                                        <i class="fas fa-shopping-cart text-primary mr-1"></i>Add To Cart
-                                    </button>
-                                    <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                    <!-- Tambahkan input untuk quantity -->
-                                    <input type="hidden" name="quantity" value="1" min="1">
-                                </form>
                             </div>
                         </div>
                     </div>
                 @endforeach
-                <div class="col-12 pb-1">
-                    @if ($products->lastPage() > 1)
-                        <nav aria-label="Page navigation">
-                            <ul class="pagination justify-content-center mb-3">
-                                <li class="page-item {{ $products->currentPage() == 1 ? 'disabled' : '' }}">
-                                    <a class="page-link" href="{{ $products->previousPageUrl() }}" aria-label="Previous">
-                                        <span aria-hidden="true">&laquo;</span>
-                                        <span class="sr-only">Previous</span>
-                                    </a>
-                                </li>
-                                @for ($i = 1; $i <= $products->lastPage(); $i++)
-                                    <li class="page-item {{ $i == $products->currentPage() ? 'active' : '' }}"><a class="page-link" href="{{ $products->url($i) }}">{{ $i }}</a></li>
-                                @endfor
-                                <li class="page-item {{ $products->currentPage() == $products->lastPage() ? 'disabled' : '' }}">
-                                    <a class="page-link" href="{{ $products->nextPageUrl() }}" aria-label="Next">
-                                        <span aria-hidden="true">&raquo;</span>
-                                        <span class="sr-only">Next</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </nav>
-                    @endif
-                </div>
             </div>
         </div>
-        @endsection
+    </div>
+    <div class="col-12 pb-1">
+        @if ($products->lastPage() > 1)
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mb-3">
+                    <li class="page-item {{ $products->onFirstPage()? 'disabled' : '' }}">
+                        <a class="page-link btn btn-outline-secondary" href="{{ $products->previousPageUrl() }}" aria-label="Previous">
+                            <i class="fas fa-chevron-left"></i>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                    </li>
+                    @for ($i = 1; $i <= $products->lastPage(); $i++)
+                        <li class="page-item {{ $products->currentPage() == $i? 'active' : '' }}">
+                            <a class="page-link btn btn-outline-secondary {{ $products->currentPage() == $i? 'btn-primary' : '' }}" href="{{ $products->url($i) }}">{{ $i }}</a>
+                        </li>
+                    @endfor
+                    <li class="page-item {{ $products->onLastPage()? 'disabled' : '' }}">
+                        <a class="page-link btn btn-outline-secondary" href="{{ $products->nextPageUrl() }}" aria-label="Next">
+                            <i class="fas fa-chevron-right"></i>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        @endif
+    </div>
+    <style>
+        .block2 {
+            height: 500px; /* Sesuaikan dengan ukuran yang diinginkan */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 20px; /* Menambahkan jarak bawah antar blok */
+        }
+
+        .block2:hover {
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            transform: translateY(-10px);
+        }
+
+        .block2-pic {
+            width: 100%;
+            height: 400px; /* Sesuaikan dengan ukuran yang diinginkan */
+            overflow: hidden;
+            margin-bottom: 20px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .block2-pic img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .block2-txt {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .block2-txt-child1 {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .block2-txt-child1 a, .block2-txt-child1 span {
+            font -size: 14px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .block2-txt-child1 a {
+            font-weight: bold;
+            text-decoration: none;
+            color: #337ab7;
+        }
+
+        .block2-txt-child1 a:hover {
+            color: #23527c;
+        }
+    </style>
+@endsection

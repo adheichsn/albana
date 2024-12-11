@@ -40,10 +40,10 @@
             </div>
             <div class="col-lg-5 mb-5">
                 <div class="d-flex flex-column mb-3">
-                    <h5 class="font-weight-semi-bold mb-3">SISI FASHION </h5>
-                    <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>Bojong Raya Jakarta Barat</p>
-                    <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>sisi@gmail.com</p>
-                    <p class="mb-2"><i class="fa fa-phone-alt text-primary mr-3"></i>+082113229533</p>
+                    <h5 class="font-weight-semi-bold mb-3">ALBANA COFFE </h5>
+                    <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>PERUMNAS KARAWACI, TANGERANG</p>
+                    <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>Fatur@gmail.com</p>
+                    <p class="mb-2"><i class="fa fa-phone-alt text-primary mr-3"></i>+62-857-2466-0875</p>
                 </div>
 
             </div>

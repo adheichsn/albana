@@ -1,11 +1,10 @@
- <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('Sisi') }}/lib/easing/easing.min.js"></script>
-    <script src="{{ asset('Sisi') }}/lib/owlcarousel/owl.carousel.min.js"></script>
-
-    <!-- Contact Javascript File -->
-    <script src="{{ asset('Sisi') }}/mail/jqBootstrapValidation.min.js"></script>
-    <script src="{{ asset('Sisi') }}/mail/contact.js"></script>
-
-    <!-- Template Javascript -->
-    <script src="{{ asset('Sisi') }}/js/main.js"></script>
+<!-- Javascript files-->
+<script src="{{ asset('html') }}/js/jquery.min.js"></script>
+<script src="{{ asset('html') }}/js/popper.min.js"></script>
+<script src="{{ asset('html') }}/js/bootstrap.bundle.min.js"></script>
+<script src="{{ asset('html') }}/js/jquery-3.0.0.min.js"></script>
+<script src="{{ asset('html') }}/js/plugin.js"></script>
+<!-- sidebar -->
+<script src="{{ asset('html') }}/js/jquery.mCustomScrollbar.concat.min.js"></script>
+<script src="{{ asset('html') }}/js/custom.js"></script>
+<script src="https://kit.fontawesome.com/c2af4accba.js" crossorigin="anonymous"></script>
